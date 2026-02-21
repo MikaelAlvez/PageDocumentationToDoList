@@ -2,6 +2,8 @@ import './index.css'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import Dashboard from './pages/Dashboard'
+import Profile from './pages/Profile'
 
 import Sidebar from './components/docs/Sidebar'
 import Hero from './components/docs/Hero'
@@ -66,6 +68,8 @@ function AppRoutes() {
 
   if (currentPage === 'docs')      return <DocsPage onNavigate={navigate} />
   if (currentPage === 'register')  return <Register onNavigate={navigate} />
+  if (currentPage === 'dashboard') return <Dashboard onNavigate={navigate} />
+  if (currentPage === 'profile')   return <Profile onNavigate={navigate} />
   return <Login onNavigate={navigate} />
 }
 

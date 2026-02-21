@@ -242,18 +242,6 @@ export default function Dashboard({ onNavigate }) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <button
-            onClick={() => onNavigate('docs')}
-            style={{
-              background: 'none', border: '1px solid var(--border)', borderRadius: 6,
-              color: 'var(--muted)', cursor: 'pointer', fontSize: 12,
-              fontFamily: "'DM Mono', monospace", padding: '5px 12px', transition: 'all 0.15s',
-            }}
-            onMouseEnter={(e) => { e.target.style.borderColor = 'var(--accent)'; e.target.style.color = 'var(--accent)' }}
-            onMouseLeave={(e) => { e.target.style.borderColor = 'var(--border)'; e.target.style.color = 'var(--muted)' }}
-          >
-            📄 Docs
-          </button>
-          <button
             onClick={() => onNavigate('profile')}
             style={{
               background: 'var(--surface2)', border: '1px solid var(--border)',
