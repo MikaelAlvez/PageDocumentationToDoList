@@ -1,9 +1,11 @@
 import './App.css'
-import Sidebar from './components/Sidebar'
-import Hero from './components/Hero'
-import AuthSection from './components/Authsection'
-import EndpointsTable from './components/Endpointstable'
-import Taskssection from './components/Taskssection'
+import Sidebar from './components/docs/Sidebar'
+import Hero from './components/docs/Hero'
+import AuthSection from './components/docs/Authsection'
+import EndpointsTable from './components/docs/Endpointstable'
+import Taskssection from './components/docs/Taskssection'
+import Errorssection from './components/docs/Errorssection'
+
 function App() {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', position: 'relative', zIndex: 1 }}>
@@ -13,6 +15,7 @@ function App() {
         <AuthSection />
         <EndpointsTable />
         <Taskssection/>
+        <Errorssection />
       </main>
     </div>
   )

@@ -91,7 +91,7 @@ export default function Sidebar() {
             color: 'white',
             letterSpacing: '0.08em',
           }}>
-            v1.0.0
+            v2.1.0
           </span>
         </div>
         <h1 style={{
