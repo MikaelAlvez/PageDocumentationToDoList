@@ -1,10 +1,14 @@
 import './App.css'
+import Sidebar from './components/Sidebar'
 
 function App() {
   return (
-    <>
-      <h1>To Do List</h1>
-    </>
+    <div style={{ display: 'flex', minHeight: '100vh', position: 'relative', zIndex: 1 }}>
+      <Sidebar />
+      <main style={{ marginLeft: 260, flex: 1, maxWidth: 900, padding: '64px 56px' }}>
+          {/* Content */}
+      </main>
+    </div>
   )
 }
 
