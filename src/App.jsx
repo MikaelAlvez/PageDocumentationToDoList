@@ -3,7 +3,7 @@ import Sidebar from './components/Sidebar'
 import Hero from './components/Hero'
 import AuthSection from './components/Authsection'
 import EndpointsTable from './components/Endpointstable'
-
+import Taskssection from './components/Taskssection'
 function App() {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', position: 'relative', zIndex: 1 }}>
@@ -12,6 +12,7 @@ function App() {
         <Hero />
         <AuthSection />
         <EndpointsTable />
+        <Taskssection/>
       </main>
     </div>
   )
