@@ -2,6 +2,7 @@ import './App.css'
 import Sidebar from './components/Sidebar'
 import Hero from './components/Hero'
 import AuthSection from './components/Authsection'
+import EndpointsTable from './components/Endpointstable'
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <main style={{ marginLeft: 260, flex: 1, maxWidth: 900, padding: '64px 56px' }}>
         <Hero />
         <AuthSection />
+        <EndpointsTable />
       </main>
     </div>
   )
