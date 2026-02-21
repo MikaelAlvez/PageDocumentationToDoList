@@ -1,54 +1,54 @@
 import { useState, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { api } from '../services/api'
+import { uploadAvatar } from '../services/cloudinary'
 import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
 import ToastContainer from '../components/ui/ToastContainer'
 import { useToast } from '../components/ui/useToast'
 
-function useAvatar() {
-  const getAvatar = () => localStorage.getItem('avatar') || null
-  const [avatar, setAvatarState] = useState(getAvatar)
-
-  const saveAvatar = (base64) => {
-    localStorage.setItem('avatar', base64)
-    setAvatarState(base64)
-  }
-
-  const removeAvatar = () => {
-    localStorage.removeItem('avatar')
-    setAvatarState(null)
-  }
-
-  return { avatar, saveAvatar, removeAvatar }
-}
-
 export default function Profile({ onNavigate }) {
   const { user, logout, refreshUser } = useAuth()
   const { toasts, success, error: toastError } = useToast()
-  const { avatar, saveAvatar, removeAvatar } = useAvatar()
   const [form, setForm] = useState({ name: user?.name || '', email: user?.email || '', password: '' })
   const [loading, setLoading] = useState(false)
+  const [avatarLoading, setAvatarLoading] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [avatarHover, setAvatarHover] = useState(false)
   const fileInputRef = useRef(null)
 
-  const handleAvatarChange = (e) => {
+  const avatarUrl = user?.avatarUrl || null
+
+  const handleAvatarChange = async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
-
-    if (file.size > 2 * 1024 * 1024) {
-      toastError('Imagem muito grande. Máximo 2MB.')
-      return
-    }
-
-    const reader = new FileReader()
-    reader.onload = (ev) => {
-      saveAvatar(ev.target.result)
+    setAvatarLoading(true)
+    try {
+      const url = await uploadAvatar(file)
+      await api.updateProfile({ avatarUrl: url })
+      await refreshUser()
       success('Foto atualizada!')
+    } catch (err) {
+      toastError(err.message)
+    } finally {
+      setAvatarLoading(false)
+      // reset input so same file can be selected again
+      e.target.value = ''
     }
-    reader.readAsDataURL(file)
+  }
+
+  const handleRemoveAvatar = async () => {
+    setAvatarLoading(true)
+    try {
+      await api.updateProfile({ avatarUrl: null })
+      await refreshUser()
+      success('Foto removida!')
+    } catch (err) {
+      toastError(err.message)
+    } finally {
+      setAvatarLoading(false)
+    }
   }
 
   const handleUpdate = async (e) => {
@@ -72,7 +72,6 @@ export default function Profile({ onNavigate }) {
     setDeleteLoading(true)
     try {
       await api.deleteProfile()
-      removeAvatar()
       logout()
       onNavigate('login')
     } catch (err) {
@@ -127,32 +126,26 @@ export default function Profile({ onNavigate }) {
 
         {/* Avatar */}
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
-
-          {/* Avatar clickable */}
           <div style={{ position: 'relative', display: 'inline-block', marginBottom: 16 }}>
+
             <div
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => !avatarLoading && fileInputRef.current?.click()}
               onMouseEnter={() => setAvatarHover(true)}
               onMouseLeave={() => setAvatarHover(false)}
               style={{
-                width: 88,
-                height: 88,
+                width: 88, height: 88,
                 borderRadius: '50%',
-                cursor: 'pointer',
+                cursor: avatarLoading ? 'default' : 'pointer',
                 position: 'relative',
                 overflow: 'hidden',
-                boxShadow: '0 0 0 3px var(--surface), 0 0 0 5px var(--border)',
+                boxShadow: avatarHover && !avatarLoading
+                  ? '0 0 0 3px var(--surface), 0 0 0 5px var(--accent)'
+                  : '0 0 0 3px var(--surface), 0 0 0 5px var(--border)',
                 transition: 'box-shadow 0.2s',
-                ...(avatarHover ? { boxShadow: '0 0 0 3px var(--surface), 0 0 0 5px var(--accent)' } : {}),
               }}
             >
-              {/* Photo or initials */}
-              {avatar ? (
-                <img
-                  src={avatar}
-                  alt="Avatar"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
                 <div style={{
                   width: '100%', height: '100%',
@@ -164,14 +157,30 @@ export default function Profile({ onNavigate }) {
                 </div>
               )}
 
+              {/* Loading overlay */}
+              {avatarLoading && (
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  background: 'rgba(0,0,0,0.6)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <div style={{
+                    width: 24, height: 24,
+                    border: '2px solid rgba(255,255,255,0.3)',
+                    borderTopColor: 'white',
+                    borderRadius: '50%',
+                    animation: 'spin 0.7s linear infinite',
+                  }} />
+                </div>
+              )}
+
               {/* Hover overlay */}
-              {avatarHover && (
+              {avatarHover && !avatarLoading && (
                 <div style={{
                   position: 'absolute', inset: 0,
                   background: 'rgba(0,0,0,0.55)',
                   display: 'flex', flexDirection: 'column',
-                  alignItems: 'center', justifyContent: 'center',
-                  gap: 4,
+                  alignItems: 'center', justifyContent: 'center', gap: 4,
                 }}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
@@ -184,21 +193,16 @@ export default function Profile({ onNavigate }) {
               )}
             </div>
 
-            {/* Remove photo button */}
-            {avatar && (
+            {/* Remove button */}
+            {avatarUrl && !avatarLoading && (
               <button
-                onClick={(e) => { e.stopPropagation(); removeAvatar(); success('Foto removida!') }}
+                onClick={(e) => { e.stopPropagation(); handleRemoveAvatar() }}
                 title="Remover foto"
                 style={{
-                  position: 'absolute',
-                  top: 0, right: -4,
-                  width: 22, height: 22,
-                  borderRadius: '50%',
-                  background: 'var(--delete)',
-                  border: '2px solid var(--bg)',
-                  color: 'white',
-                  fontSize: 12,
-                  cursor: 'pointer',
+                  position: 'absolute', top: 0, right: -4,
+                  width: 22, height: 22, borderRadius: '50%',
+                  background: 'var(--delete)', border: '2px solid var(--bg)',
+                  color: 'white', fontSize: 14, cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   lineHeight: 1,
                 }}
@@ -220,18 +224,20 @@ export default function Profile({ onNavigate }) {
             {user?.name}
           </h1>
           <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 8 }}>{user?.email}</p>
+
           <button
             onClick={() => fileInputRef.current?.click()}
+            disabled={avatarLoading}
             style={{
               background: 'none', border: '1px solid var(--border)',
               borderRadius: 6, color: 'var(--muted)', cursor: 'pointer',
               fontSize: 12, fontFamily: "'DM Mono', monospace", padding: '4px 12px',
-              transition: 'all 0.15s',
+              transition: 'all 0.15s', opacity: avatarLoading ? 0.5 : 1,
             }}
             onMouseEnter={(e) => { e.target.style.borderColor = 'var(--accent)'; e.target.style.color = 'var(--accent)' }}
             onMouseLeave={(e) => { e.target.style.borderColor = 'var(--border)'; e.target.style.color = 'var(--muted)' }}
           >
-            {avatar ? '🖼️ Alterar foto' : '📷 Adicionar foto'}
+            {avatarLoading ? '⏳ Enviando...' : avatarUrl ? '🖼️ Alterar foto' : '📷 Adicionar foto'}
           </button>
         </div>
 
@@ -256,9 +262,7 @@ export default function Profile({ onNavigate }) {
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
             />
-            <Button type="submit" loading={loading} fullWidth>
-              Salvar alterações
-            </Button>
+            <Button type="submit" loading={loading} fullWidth>Salvar alterações</Button>
           </form>
         </div>
 
@@ -273,21 +277,15 @@ export default function Profile({ onNavigate }) {
             Ao deletar sua conta, todos os seus dados e tarefas serão removidos permanentemente.
           </p>
           {!confirmDelete ? (
-            <Button variant="danger" onClick={() => setConfirmDelete(true)} fullWidth>
-              Deletar conta
-            </Button>
+            <Button variant="danger" onClick={() => setConfirmDelete(true)} fullWidth>Deletar conta</Button>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <p style={{ fontSize: 13, color: 'var(--delete)', textAlign: 'center', fontWeight: 500 }}>
                 Tem certeza? Essa ação não pode ser desfeita.
               </p>
               <div style={{ display: 'flex', gap: 10 }}>
-                <Button variant="danger" loading={deleteLoading} onClick={handleDelete} style={{ flex: 1 }}>
-                  Sim, deletar
-                </Button>
-                <Button variant="ghost" onClick={() => setConfirmDelete(false)} style={{ flex: 1 }}>
-                  Cancelar
-                </Button>
+                <Button variant="danger" loading={deleteLoading} onClick={handleDelete} style={{ flex: 1 }}>Sim, deletar</Button>
+                <Button variant="ghost" onClick={() => setConfirmDelete(false)} style={{ flex: 1 }}>Cancelar</Button>
               </div>
             </div>
           )}
@@ -295,6 +293,7 @@ export default function Profile({ onNavigate }) {
       </div>
 
       <ToastContainer toasts={toasts} />
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   )
 }

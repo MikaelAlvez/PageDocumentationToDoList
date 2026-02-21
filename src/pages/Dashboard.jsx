@@ -96,8 +96,8 @@ export default function Dashboard({ onNavigate }) {
               fontSize: 12, fontWeight: 700, color: 'white',
               overflow: 'hidden', flexShrink: 0,
             }}>
-              {localStorage.getItem('avatar')
-                ? <img src={localStorage.getItem('avatar')} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              {user?.avatarUrl
+                ? <img src={user?.avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 : user?.name?.[0]?.toUpperCase()
               }
             </div>
