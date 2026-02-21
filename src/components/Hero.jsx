@@ -18,7 +18,7 @@ export default function Hero() {
       <div style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 8,
+        gap: 10,
         fontFamily: "'DM Mono', monospace",
         fontSize: 11,
         letterSpacing: '0.1em',
@@ -26,8 +26,9 @@ export default function Hero() {
         color: 'var(--accent)',
         marginBottom: 20,
       }}>
-        <span style={{ display: 'block', width: 24, height: 1, background: 'var(--accent)' }} />
-        Documentação de API
+        <span style={{ display: 'block', width: 100, height: 1, background: 'var(--accent)' }} />
+            Documentação de API
+        <span style={{ display: 'block', width: 100, height: 1, background: 'var(--accent)' }} />
       </div>
 
       <h1 style={{
