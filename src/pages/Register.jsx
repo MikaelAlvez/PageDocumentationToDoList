@@ -54,11 +54,11 @@ export default function Register({ onNavigate }) {
             <span style={{ fontSize: 38 }}>✓</span>
             <span style={{
               fontFamily: "'Syne', sans-serif",
-              fontSize: 40,
+              fontSize: 25,
               fontWeight: 800,
               color: 'white',
             }}>
-              To-Do List
+              To-Do List Tarefy
             </span>
           </div>
           <h1 style={{

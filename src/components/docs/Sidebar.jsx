@@ -101,7 +101,7 @@ export default function Sidebar() {
           color: 'var(--text)',
           lineHeight: 1.3,
         }}>
-          To-Do List API
+          To-Do List Tarefy API
         </h1>
         <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4 }}>
           Documentação de Endpoints

@@ -240,7 +240,7 @@ export default function Dashboard({ onNavigate }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ fontSize: 20 }}>✓</span>
           <span style={{ fontFamily: "'Syne', sans-serif", fontSize: 16, fontWeight: 700, color: 'var(--text)' }}>
-            To-Do List
+            To-Do List Tarefy
           </span>
         </div>
 

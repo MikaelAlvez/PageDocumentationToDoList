@@ -43,7 +43,7 @@ export default function Hero() {
         backgroundClip: 'text',
         marginBottom: 20,
       }}>
-        To-Do List<br />API
+        To-Do List Tarefy<br />API
       </h1>
 
       <p style={{
