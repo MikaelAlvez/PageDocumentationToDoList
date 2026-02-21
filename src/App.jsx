@@ -1,8 +1,8 @@
 import './index.css'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import Login from './pages/Login'
+import Register from './pages/Register'
 
-// Import docs components
 import Sidebar from './components/docs/Sidebar'
 import Hero from './components/docs/Hero'
 import AuthSection from './components/docs/Authsection'
@@ -65,6 +65,7 @@ function AppRoutes() {
   const currentPage = user && (page === 'login' || page === 'register') ? 'dashboard' : page
 
   if (currentPage === 'docs')      return <DocsPage onNavigate={navigate} />
+  if (currentPage === 'register')  return <Register onNavigate={navigate} />
   return <Login onNavigate={navigate} />
 }
 
