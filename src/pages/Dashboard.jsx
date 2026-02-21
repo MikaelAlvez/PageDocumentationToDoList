@@ -16,7 +16,6 @@ function TaskCard({ task, onUpdate, onDelete }) {
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({ title: task.title, description: task.description || '', status: task.status })
   const [loading, setLoading] = useState(false)
-  //const s = STATUS_LABELS[task.status]
 
   const handleSave = async () => {
     setLoading(true)
@@ -98,7 +97,6 @@ function TaskCard({ task, onUpdate, onDelete }) {
             </div>
           </div>
 
-          {/* Status selector */}
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {Object.entries(STATUS_LABELS).map(([key, val]) => (
               <button
@@ -177,7 +175,7 @@ function CreateTaskModal({ onClose, onCreate }) {
 }
 
 export default function Dashboard({ onNavigate }) {
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
   const { toasts, success, error: toastError } = useToast()
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
@@ -207,6 +205,11 @@ export default function Dashboard({ onNavigate }) {
     await api.deleteTask(id)
     setTasks((prev) => prev.filter((t) => t.id !== id))
     success('Tarefa deletada!')
+  }
+
+  const handleLogout = () => {
+    logout()
+    onNavigate('login')
   }
 
   const filtered = filter === 'all' ? tasks : tasks.filter((t) => t.status === filter)
@@ -240,24 +243,68 @@ export default function Dashboard({ onNavigate }) {
             To-Do List
           </span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/* User profile button */}
           <button
             onClick={() => onNavigate('profile')}
             style={{
               background: 'var(--surface2)', border: '1px solid var(--border)',
               borderRadius: 8, padding: '6px 14px', cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: 8,
+              transition: 'border-color 0.15s',
             }}
+            onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--accent)'}
+            onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
           >
             <div style={{
               width: 26, height: 26, borderRadius: '50%',
               background: 'linear-gradient(135deg, var(--accent), var(--accent2))',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 12, fontWeight: 700, color: 'white',
+              overflow: 'hidden', flexShrink: 0,
             }}>
-              {user?.name?.[0]?.toUpperCase()}
+              {localStorage.getItem('avatar')
+                ? <img src={localStorage.getItem('avatar')} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                : user?.name?.[0]?.toUpperCase()
+              }
             </div>
             <span style={{ fontSize: 13, color: 'var(--text)' }}>{user?.name}</span>
+          </button>
+
+          {/* Logout button */}
+          <button
+            onClick={handleLogout}
+            title="Sair"
+            style={{
+              background: 'none',
+              border: '1px solid rgba(239,68,68,0.2)',
+              borderRadius: 8,
+              padding: '10px 12px',
+              cursor: 'pointer',
+              color: 'var(--delete)',
+              fontSize: 15,
+              fontFamily: "'DM Sans', sans-serif",
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              transition: 'all 0.15s',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(239,68,68,0.08)'
+              e.currentTarget.style.borderColor = 'rgba(239,68,68,0.4)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'none'
+              e.currentTarget.style.borderColor = 'rgba(239,68,68,0.2)'
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            Sair
           </button>
         </div>
       </nav>
