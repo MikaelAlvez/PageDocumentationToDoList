@@ -12,7 +12,10 @@ export function AuthProvider({ children }) {
     if (token) {
       api.getProfile()
         .then(setUser)
-        .catch(() => localStorage.removeItem('token'))
+        .catch(() => {
+          localStorage.removeItem('token')
+          localStorage.removeItem('avatar') // limpa avatar órfão
+        })
         .finally(() => setLoading(false))
     } else {
       setLoading(false)
@@ -20,6 +23,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   const login = async (email, password) => {
+    localStorage.removeItem('avatar') // garante que não sobra avatar de outro usuário
     const data = await api.login({ email, password })
     localStorage.setItem('token', data.access_token)
     const profile = await api.getProfile()
@@ -28,6 +32,7 @@ export function AuthProvider({ children }) {
   }
 
   const register = async (name, email, password) => {
+    localStorage.removeItem('avatar')
     const data = await api.register({ name, email, password })
     localStorage.setItem('token', data.access_token)
     const profile = await api.getProfile()
@@ -37,6 +42,7 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     localStorage.removeItem('token')
+    localStorage.removeItem('avatar') // limpa avatar ao sair
     setUser(null)
   }
 
